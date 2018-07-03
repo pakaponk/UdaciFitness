@@ -1,9 +1,18 @@
 import React, { Component } from 'react'
-import { View, Text } from 'react-native'
-import { getMetricMetaInfo } from '../utils/helpers'
+import { View, Text, TouchableOpacity } from 'react-native'
+import { getMetricMetaInfo, timeToString } from '../utils/helpers'
 import UdaciSlider from './UdaciSlider'
 import UdaciStepper from './UdaciStepper'
+import DateHeader from './DateHeader'
 
+function SubmitBtn ({ onPress}) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}>
+      <Text>Submit</Text>
+    </TouchableOpacity>
+  )
+}
 
 export default class AddEntry extends Component {
 	state = {
@@ -44,13 +53,35 @@ export default class AddEntry extends Component {
 		this.setState(() => ({
 			[metric]: value
 		}))
-	}
+  }
+  
+  submit = () => {
+    const key = timeToString()
+    const entry = this.state
+  
+    // Update Redux
+
+    this.setState(() => ({
+      run: 0,
+      bike: 0,
+      swim: 0,
+      sleep: 0,
+      eat: 0
+    }))
+
+    // Navigate to Home
+
+    // Save to "DB"
+
+    // Clear local notification
+  }
 
 	render() {
 		const metaInfo = getMetricMetaInfo()
 
 		return (
-			<View>
+      <View>
+        <DateHeader date={(new Date().toLocaleDateString())} />
 				{Object.keys(metaInfo).map((key) => {
 					const { getIcon, type, ...rest } = metaInfo[key]
 					const value = this.state[key]
@@ -66,13 +97,14 @@ export default class AddEntry extends Component {
 									/>
 								: <UdaciStepper 
 									  value={value}
-									  onIncrement={(key) => this.increment(key)}
-                    onDecrement={(key) => this.decrement(key)}
+									  onIncrement={() => this.increment(key)}
+                    onDecrement={() => this.decrement(key)}
                     {...rest}
 							  	/> }
 						</View>
 					)
-				})}
+        })}
+        <SubmitBtn onPress={this.submit} />
 			</View>
 		)
 	}
